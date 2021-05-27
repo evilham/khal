@@ -27,6 +27,7 @@ import logging
 import re
 from calendar import isleap
 from time import strptime
+from typing import List
 
 import pytz
 from khal.exceptions import FatalError, DateTimeParseError
@@ -34,20 +35,16 @@ from khal.exceptions import FatalError, DateTimeParseError
 logger = logging.getLogger('khal')
 
 
-def timefstr(dtime_list, timeformat):
+def timefstr(dtime_list: List[str], timeformat: str) -> dt.datetime:
     """converts the first item of a list (a time as a string) to a datetimeobject
 
     where the date is today and the time is given by a string
-    removes "used" elements of list
-
-    :type dtime_list: list(str)
-    :type timeformat: str
-    :rtype: datetime.datetime
+    removes "used" elements of list.
     """
     if len(dtime_list) == 0:
         raise ValueError()
-    time_start = dt.datetime.strptime(dtime_list[0], timeformat)
-    time_start = dt.time(*time_start.timetuple()[3:5])
+    datetime_start = dt.datetime.strptime(dtime_list[0], timeformat)
+    time_start = dt.time(*datetime_start.timetuple()[3:5])
     day_start = dt.date.today()
     dtstart = dt.datetime.combine(day_start, time_start)
     dtime_list.pop(0)
@@ -93,13 +90,11 @@ def datetimefstr(dtime_list, dateformat, default_day=None, infer_year=True,
         return dt.datetime(*dtstart[:5])
 
 
-def weekdaypstr(dayname):
+def weekdaypstr(dayname: str) -> int:
     """converts an (abbreviated) dayname to a number (mon=0, sun=6)
 
     :param dayname: name of abbreviation of the day
-    :type dayname: str
     :return: number of the day in a week
-    :rtype: int
     """
 
     if dayname in ['monday', 'mon']:
@@ -119,7 +114,7 @@ def weekdaypstr(dayname):
     raise ValueError('invalid weekday name `%s`' % dayname)
 
 
-def construct_daynames(date_):
+def construct_daynames(date_: dt.date) -> str:
     """converts datetime.date into a string description
 
     either `Today`, `Tomorrow` or name of weekday.
@@ -132,13 +127,11 @@ def construct_daynames(date_):
         return date_.strftime('%A')
 
 
-def calc_day(dayname):
+def calc_day(dayname: str) -> dt.datetime:
     """converts a relative date's description to a datetime object
 
     :param dayname: relative day name (like 'today' or 'monday')
-    :type dayname: str
     :returns: date
-    :rtype: datetime.datetime
     """
     today = dt.datetime.combine(dt.date.today(), dt.time.min)
     dayname = dayname.lower()
@@ -184,14 +177,14 @@ def datetimefstr_weekday(dtime_list, timeformat, **kwargs):
     return dtime
 
 
-def guessdatetimefstr(dtime_list, locale, default_day=None, in_future=True):
+def guessdatetimefstr(
+    dtime_list: list,
+    locale: dict,
+    default_day: dt.date=None,
+    in_future=True,
+) -> dt.datetime:
     """
-    :type dtime_list: list
-    :type locale: dict
-    :type default_day: datetime.datetime
     :param in_future: if set, shortdate(time) events will be set in the future
-    :type in_future: bool
-    :rtype: datetime.datetime
     """
     # if now() is called as default param, mocking with freezegun won't work
     if default_day is None:

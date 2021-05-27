@@ -155,7 +155,7 @@ def global_options(f):
 def build_collection(conf, selection):
     """build and return a khalendar.CalendarCollection from the configuration"""
     try:
-        props = dict()
+        props = {}
         for name, cal in conf['calendars'].items():
             if selection is None or name in selection:
                 props[name] = {

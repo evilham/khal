@@ -30,6 +30,9 @@ import string
 from calendar import month_abbr, timegm
 from textwrap import wrap
 
+from typing import Tuple
+from typing import Union
+
 
 def generate_random_uid() -> str:
     """generate a random uid
@@ -49,7 +52,7 @@ ansi_sgr = re.compile(r'\x1b\['
                       'm')
 
 
-def find_last_reset(string):
+def find_last_reset(string: str) -> Tuple[int, int, str]:
     for match in re.finditer(ansi_reset, string):  # noqa B007: this is actually used below.
         pass
     try:
@@ -58,7 +61,7 @@ def find_last_reset(string):
         return -2, -1, ''
 
 
-def find_last_sgr(string):
+def find_last_sgr(string: str) -> Tuple[int, int, str]:
     for match in re.finditer(ansi_sgr, string):  # noqa B007: this is actually used below.
         pass
     try:
@@ -67,7 +70,7 @@ def find_last_sgr(string):
         return -2, -1, ''
 
 
-def find_unmatched_sgr(string):
+def find_unmatched_sgr(string: str) -> Union[str, bool]:
     reset_pos, _, _ = find_last_reset(string)
     sgr_pos, _, sgr = find_last_sgr(string)
     if sgr_pos > reset_pos:
@@ -141,7 +144,7 @@ def to_naive_utc(dtime):
     return dtime_naive
 
 
-def is_aware(dtime):
+def is_aware(dtime: dt.datetime) -> bool:
     """test if a datetime instance is timezone aware"""
     if dtime.tzinfo is not None and dtime.tzinfo.utcoffset(dtime) is not None:
         return True

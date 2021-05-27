@@ -7,7 +7,7 @@ import errno
 import os
 import uuid
 
-from typing import Optional, Tuple, Iterable  # noqa
+from typing import Optional, Tuple, Iterable, Union  # noqa
 from ..custom_types import SupportsRaw
 
 from atomicwrites import atomic_write
@@ -30,13 +30,13 @@ class cached_property:
         return result
 
 
-def to_unicode(x, encoding='ascii'):
+def to_unicode(x: Union[str, bytes], encoding='ascii'):
     if not isinstance(x, str):
         return x.decode(encoding)
     return x
 
 
-def to_bytes(x, encoding='ascii'):
+def to_bytes(x: Union[str, bytes], encoding='ascii'):
     if not isinstance(x, bytes):
         return x.encode(encoding)
     return x
@@ -51,7 +51,7 @@ def _href_safe(uid, safe=SAFE_UID_CHARS):
     return not bool(set(uid) - set(safe))
 
 
-def _generate_href(uid=None, safe=SAFE_UID_CHARS):
+def _generate_href(uid=None, safe=SAFE_UID_CHARS) -> str:
     if not uid or not _href_safe(uid, safe):
         return to_unicode(uuid.uuid4().hex)
     else:
@@ -182,7 +182,7 @@ class VdirBase:
         kwargs['path'] = path
         return kwargs
 
-    def _get_filepath(self, href):
+    def _get_filepath(self, href) -> str:
         return os.path.join(self.path, href)
 
     def _get_href(self, uid):
